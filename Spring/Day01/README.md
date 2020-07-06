@@ -51,16 +51,47 @@
         在spring的配置文件中使用bean标签，配以id和class属性之后，且没有其他属性和标签时，
         采用的就是默认构造函数创建，此时如果类中没有默认构造函数，则对象无法创建；
         */
+        <bean id="accountService" class="com.itheima.service.impl.AccountServiceImpl"></bean>
         ```
-
+        
      2. ```java
-        
+        /*
+            【有些类存在于jar包中，无法通过修改源码来提供构造函数】的情况；
+           使用普通工厂中的方法创建对象，或者称为使用某个类中的方法创建对象，并存入spring容器；
+              【可以这样理解，如果构造函数被重写并且有参数，此时就需要借助第三方（工厂类）来将这个构造函数的参数传入，从而完成配置文件，使spring可以通过配置文件得到key-value对，并存入spring容器】
+              */
+            <bean id="instanceFactory" class="com.itheima.factory.InstanceFactory"></bean>
+                  
+            <bean id="accountService" factory-bean="instanceFactory" factory-method="getAccountService"></bean>
         ```
-
+     
      3. ```java
-        
+        /*
+        使用工厂中的静态方法创建对象（使用某个类中的静态方法创建对象，并存入spring容器）
+        */
+        <bean id="accountService" class="com.itheima.factory.staticFactory" factory-method="getAccountService"></bean>
         ```
-
+     
+        4. 心得：此处配置文件意在创建key-value对，形成一种映射，从而存在spring容器中，可以通过后面的getBean(“key”)方法来获得。
+     
   2. bean对象的作用范围：
-
+  
+     - <bean>标签的scope属性
+       - 用于指定bean的作用范围；
+       - 取值：
+         1. singleton：单例（Default） 【常用】
+         2. prototype：多例 【常用】
+         3. request：作用于web应用的请求范围
+         4. session：作用于web应用的会话范围
+         5. global-session：作用于集群环境的（全局）会话范围，当不是集群环境时，等同于session
+  
   3. bean对象的生命周期：
+  
+     1. 单例对象：【与所存放的容器相同】
+        - 产生：容器创建时产生
+        - 存在：容器在，就在
+        - 摧毁：容器销毁，则对象摧毁
+     2. 多例对象：
+        - 产生：使用对象时，spring创建
+        - 存在：对象使用过程中
+        - 摧毁：当对象长时间不用，且没有别的对象引用时，由Java垃圾回收机制回收

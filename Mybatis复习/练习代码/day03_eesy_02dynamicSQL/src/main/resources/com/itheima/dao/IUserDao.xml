@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itheima.dao.IUserDao">
+
+    <!-- 查询所有操作-->
+    <select id="findAll" resultType="user">
+        select * from user;
+    </select>
+
+    <!-- 根据id查询用户信息-->
+    <select id="findById" parameterType="java.lang.Integer" resultType="com.itheima.domain.User">
+        select * from  user where id = #{uid}
+    </select>
+
+    <!-- 根据名称模糊查询-->
+    <select id="findByName" parameterType="String" resultType="com.itheima.domain.User">
+        select * from user where username like #{name}
+    </select>
+
+<!--    根据queryVo的条件查询用户-->
+    <select id="findUserByVo" parameterType="com.itheima.domain.QueryVo" resultType="com.itheima.domain.User">
+        select * from user where username like #{user.username}
+    </select>
+
+<!--    根据条件查询 使用where 1=1 -->
+<!--    <select id="findUserByCondition" parameterType="com.itheima.domain.User" resultType="com.itheima.domain.User">-->
+<!--        select * from user where 1=1-->
+<!--        <if test="username != null">-->
+<!--            and username = #{username}-->
+<!--        </if>-->
+<!--        <if test="sex != null">-->
+<!--            and sex = #{sex}-->
+<!--        </if>-->
+<!--    </select>-->
+
+
+    <select id="findUserByCondition" parameterType="com.itheima.domain.User" resultType="com.itheima.domain.User">
+        select * from user
+        <where>
+            <if test="username != null">
+                and username = #{username}
+            </if>
+            <if test="sex != null">
+                and sex = #{sex}
+            </if>
+        </where>
+    </select>
+
+<!--    根据QueryVo中id集合实现查询用户列表-->
+    <select id="findUserInIds" resultType="com.itheima.domain.User" parameterType="com.itheima.domain.QueryVo">
+<!--        此处使用了下面抽取的重复语句-->
+        <include refid="defaultUser"></include>
+<!--        select * from user-->
+        <where>
+            <if test="ids != null and ids.size() > 0">
+                <foreach collection="ids" open="and id in (" close=")" item="uId" separator=",">
+                    #{uId}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+
+<!--    了解的内容，抽取重复的SQL语句-->
+    <sql id="defaultUser">
+        select * from user
+    </sql>
+
+    <insert id="insertUser" parameterType="com.itheima.domain.User">
+        insert into user(username, birthday, sex, address) values(#{username}, #{birthday}, #{sex}, #{address})
+    </insert>
+
+</mapper>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itheima.dao.IUserDao">
+
+<!--    配置查询结果列名和实体类的映射-->
+<!--    然后需要把下面操作的resultType改为resultMap并选择这里的标识<resultMap>中的id属性值-->
+    <resultMap id="userMap" type="com.itheima.domain.User">
+<!--        主键字段对应-->
+        <id property="实体类中的名称" column="id"></id>
+<!--        非主键字段对应-->
+        <result property="实体类中的名称" column="username"></result>
+        <result property="实体类中的名称" column="address"></result>
+        <result property="实体类中的名称" column="sex"></result>
+        <result property="实体类中的名称" column="birthday"></result>
+    </resultMap>
+
+    <!-- 查询所有操作-->
+    <select id="findAll" resultType="user">
+        select * from user;
+    </select>
+    
+    <!-- 保存用户-->
+    <insert id="saveUser" parameterType="com.itheima.domain.User">
+    <!-- 配置插入操作后获取插入数据的id-->
+        <selectKey keyProperty="id" keyColumn="id" resultType="int" order="AFTER">
+            select last_insert_id();
+        </selectKey>
+        insert into user(username, address, sex, birthday) values(#{username}, #{address}, #{sex}, #{birthday});
+    </insert>
+
+    <!-- 更新用户-->
+    <update id="updateUser" parameterType="com.itheima.domain.User">
+        update user set username=#{username}, address=#{address}, sex=#{sex}, birthday=#{birthday} where id=#{id}
+    </update>
+
+    <!-- 删除用户-->
+    <delete id="deleteUser" parameterType="java.lang.Integer">
+        delete from user where id = #{uid};
+    </delete>
+
+    <!-- 根据id查询用户信息-->
+    <select id="findById" parameterType="java.lang.Integer" resultType="com.itheima.domain.User">
+        select * from  user where id = #{uid}
+    </select>
+
+    <!-- 根据名称模糊查询-->
+    <select id="findByName" parameterType="String" resultType="com.itheima.domain.User">
+        select * from user where username like #{name}
+<!--        下面这种用得少-->
+<!--        select * from user where username like '%${value}%'-->
+    </select>
+
+    <!-- 获取用户总记录条数-->
+    <select id="findTotal" resultType="int">
+        select count(id) from user;
+    </select>
+
+<!--    根据queryVo的条件查询用户-->
+    <select id="findUserByVo" parameterType="com.itheima.domain.QueryVo" resultType="com.itheima.domain.User">
+<!--        此处用user.username来对应username，因为user是一个类，不能跟属性对应，
+            而使用user又是因为user是QueryVo类中的一个成员变量-->
+        select * from user where username like #{user.username}
+    </select>
+</mapper>

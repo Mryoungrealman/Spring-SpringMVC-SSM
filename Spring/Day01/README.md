@@ -9,6 +9,8 @@
 
 ## 2. Spring 初步
 
+> 2020年7月6日
+
 - 基本概念-IOC：
 
   控制反转，即将创建对象的权利交给框架；
@@ -95,3 +97,132 @@
         - 产生：使用对象时，spring创建
         - 存在：对象使用过程中
         - 摧毁：当对象长时间不用，且没有别的对象引用时，由Java垃圾回收机制回收
+
+***
+
+## 3. 依赖注入
+
+1. spring中的依赖注入（Dependency injection）：
+
+   - IOC作用：降低耦合（依赖关系）；
+
+     依赖关系的管理：交给spring来维护。即当前类需要用到其他类的对象时，由spring提供，只需在spring中说明；
+
+     依赖关系的维护称为 依赖注入；
+
+   - 注入数据，三种：
+
+     1. 基本类型 和 string
+
+     2. 其他 bean 类型 （在配置文件中 或 注解中配置过的bean）
+
+     3. 复杂类型（集合类型）：
+
+        - 用于List结构集合注入的标签：
+
+          list / array / set
+
+        - 用于给map结构集合注入的标签：
+
+          map / props
+
+        - 结构相同，标签可以互换，即：只有值 与 key-value对 ；
+
+        - ```java
+              <bean id="accountService3" class="com.itheima.service.impl.AccountServiceImpl3">
+                  <property name="myStrs">
+                      <array>
+                          <value>AAA</value>
+                          <value>BBB</value>
+                          <value>CCC</value>
+                      </array>
+                  </property>
+          
+                  <property name="myList">
+                      <list>
+                          <value>AAA</value>
+                          <value>BBB</value>
+                          <value>CCC</value>
+                      </list>
+                  </property>
+          
+                  <property name="mySet">
+                      <set>
+                          <value>AAA</value>
+                          <value>BBB</value>
+                          <value>CCC</value>
+                      </set>
+                  </property>
+          
+                  <property name="myMap">
+                      <map>
+                          <entry key="testA" value="AAA"></entry>
+                          <entry key="testB" value="BBB"></entry>
+                          <entry key="testC" value="CCC"></entry>
+                      </map>
+                  </property>
+          
+                  <property name="myProps">
+                      <props>
+                          <prop key="testC">ccc</prop>
+                          <prop key="testD">ddd</prop>
+                      </props>
+                  </property>
+              </bean>
+          ```
+
+   - 注入方式：
+
+     1. 使用构造函数；
+
+        - ```java
+          /*
+          使用 constructor-arg 标签，出现在bean标签内部；
+          属性:
+          	type：指定要注入的数据类型，也是构造函数中参数的类型；
+          	index：给构造函数中 指定索引位置 的参数赋值，索引位置从0开始；
+          	name：给构造函数中指定名称的参数赋值；	【常用】
+          	【以上三个，用于指定给哪个参数赋值】
+          	
+          	value：用于提供基本类型和String类型的数据；
+          	ref：用于指定其他的bean类型数据；即在在spring的IOC核心容器中出现过的bean对象；
+          */
+          
+              <bean id="accountService" class="com.itheima.service.impl.AccountServiceImpl">
+                  <constructor-arg name="name" value="哈个哈"></constructor-arg>
+                  <constructor-arg name= "age" value="18"></constructor-arg>
+                  <constructor-arg name= "birthday" ref="now"></constructor-arg>
+              </bean>
+          
+              <bean id="now" class="java.util.Date"></bean>
+          ```
+
+        - 优势：（有构造函数，更改了默认构造函数）获取bean对象时，注入数据是必须的操作，否则对象无法创建成功。
+
+        - 弊端：改变了bean对象的实例化方式。创建对象时，如果用不到这些数据也必须提供。
+
+     2. 使用set方法；  **【比1更常用】**
+
+        - ```java
+          /*
+          使用 property 标签，出现在bean标签内部
+          属性：
+          	name：用于指定注入时所调用的 set 方法名称；
+          	value：用于提供基本类型和String类型的数据；
+          	ref：用于指定其他的bean类型数据；即在在spring的IOC核心容器中出现过的bean对象；
+          */
+          
+              <bean id="now" class="java.util.Date"></bean>
+          
+              <bean id="accountService2" class="com.itheima.service.impl.AccountServiceImpl2">
+                  <property name="name" value="哈喽"></property>
+                  <property name="age" value="22"></property>
+                  <property name="birthday" ref="now"></property>
+              </bean>
+          ```
+
+        - 优势：创建对象时，没有明确限制，可以直接使用默认构造函数；
+
+        - 弊端：若要求某个成员必须有值，set方法无法保证一定注入。
+
+     3. 使用注解提供；

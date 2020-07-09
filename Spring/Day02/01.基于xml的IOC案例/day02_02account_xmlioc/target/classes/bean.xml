@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+<!--    配置的时候，遵循从外到里的顺序，即外面的类会调用里面类的对象，
+        当里面的类也需要注入时（即为其他bean类型对象），再次往下配置bean对象；
+        -->
+<!--    配置service对象-->
+    <bean id="accountService" class="com.itheima.service.impl.AccountServiceImpl">
+<!--        配置set方法注入-->
+        <property name="accountDao" ref="accountDao"></property>
+    </bean>
+
+<!--    配置Dao对象-->
+    <bean id="accountDao" class="com.itheima.dao.impl.AccountDaoImpl">
+<!--        注入 QueryRunner-->
+        <property name="runner" ref="runner"></property>
+    </bean>
+
+<!--    配置QueryRunner对象-->
+<!--    为防止线程间相互干扰，需要将单例对象配置为多例对象-->
+    <bean id="runner" class="org.apache.commons.dbutils.QueryRunner" scope="prototype">
+<!--        注入数据源-->
+        <constructor-arg name="ds" ref="dataSource"></constructor-arg>
+    </bean>
+
+<!--    配置数据源-->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+<!--        注入连接数据库的必备信息-->
+        <property name="driverClass" value="com.mysql.cj.jdbc.Driver"></property>
+        <property name="jdbcUrl" value="jdbc:mysql://localhost:3306/eesy"></property>
+        <property name="user" value="root"></property>
+        <property name="password" value="123"></property>
+    </bean>
+
+
+<!--    额外的bean，意图将account创建为bean，但其常变，不易注入，不创建为bean-->
+<!--    <bean id="account" class="com.itheima.domain.Account"></bean>-->
+</beans>

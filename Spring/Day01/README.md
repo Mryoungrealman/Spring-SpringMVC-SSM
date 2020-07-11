@@ -342,51 +342,64 @@
             - 属性：
 
               value	用于指定注入 bean 的 id ；
+        
+            - 给方法参数注入写法例子：
 
+              ```java
+        //多个数据源时，当匹配不上时，使用该注解匹配；
+              public QueryRunner createQueryRunner(@Qualifier("ds2") DataSource dataSource){
+                return new QueryRunner(dataSource);
+              }
+        
+              /*
+        当注解的实现类中含有 ElementType.PARAMETER 时，说明其可以用在方法参数中；
+              */
+              ```
+      
          3. @Resource
-
-            - 直接按照 bean 的 id 注入， 可以独立使用；
-
-            - 属性：
-
-              name	用于指定注入 bean 的 id ；
-
-         ***
-
-         > 以上三个注解只能注入 **bean** 类型，
+      
+      - 直接按照 bean 的 id 注入， 可以独立使用；
+      
+      - 属性：
+      
+        name	用于指定注入 bean 的 id ；
+      
+   ***
+      
+   > 以上三个注解只能注入 **bean** 类型，
          >
-         > 基本类型 和 String 类型 **无法**使用上述注解实现，
+   > 基本类型 和 String 类型 **无法**使用上述注解实现，
          >
-         > 集合类型 **只能**通过 **XML** 实现。
-
-         ***
-
-         1. @Value
-
-            - 用于注入 基本类型 和 String 类型；
-
-            - 属性：
-
-              value	用于指定属性的值，可以使用 spring 中的 SpEL（spring 的 EL 表达式）;
-
-              - SpEL：${表达式}	//可以根据其出现位置，判断是谁的 EL 表达式；
-
-      3. 改变作用范围：
-
-         - 与XML中<bean>标签中使用<scope>标签作用相同；
-
+   > 集合类型 **只能**通过 **XML** 实现。
+      
+   ***
+      
+   1. @Value
+      
+      - 用于注入 基本类型 和 String 类型；
+      
+      - 属性：
+      
+        value	用于指定属性的值，可以使用 spring 中的 SpEL（spring 的 EL 表达式）;
+      
+        - SpEL：${表达式}	//可以根据其出现位置，判断是谁的 EL 表达式；
+      
+3. 改变作用范围：
+      
+   - 与XML中<bean>标签中使用<scope>标签作用相同；
+      
          1. @Scope
-
+      
             - 指定作用范围，单例 还是 多例；
-
+      
             - 属性：
-
+      
               value	取值：singleton / prototype
-
+      
       4. 与生命周期相关：  【了解即可】
-
+      
          - 与XML中<bean>标签中使用<init-method>和<destroy-method>标签作用相同；
-
+      
          1. PreDestroy
             -  用于指定销毁方法；
          2. PostConstruct
